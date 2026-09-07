@@ -38,6 +38,53 @@ Backlog MRV ada di `docs/prd.md` §14 — tidak dikerjakan sebelum MVP terbukti 
 Lowongan → Lamaran → Review → Diterima → Penugasan → Laporan Mingguan → Evaluasi → Selesai
 ```
 
+## Struktur
+
+```text
+apps/
+  api/                 Express + TypeScript (routes → controllers → services → repositories)
+  web/                 Next.js App Router + Tailwind CSS
+packages/
+  contracts/           enum, tabel transisi status, schema Zod — dipakai api DAN web
+docker-compose.yml     PostgreSQL untuk pengembangan lokal
+```
+
+`packages/contracts` adalah alasan utama repo ini digabung: aturan transisi
+status dan schema validasi hidup di satu tempat, lalu backend memakainya untuk
+menolak dan frontend memakainya untuk menentukan tombol mana yang muncul. Dua
+sisi tidak bisa berbeda pendapat soal status.
+
+## Menjalankan di lokal
+
+Butuh Node ≥ 22, pnpm 11, dan Docker.
+
+```bash
+pnpm install
+
+cp .env.example .env                      # kredensial Postgres lokal
+cp apps/api/.env.example apps/api/.env    # isi JWT_SECRET (min 32 karakter)
+cp apps/web/.env.example apps/web/.env.local
+
+pnpm db:up                                # Postgres di 127.0.0.1:5432
+pnpm dev                                  # api :4000, web :3000
+```
+
+API sengaja **gagal start** kalau `JWT_SECRET` atau `DATABASE_URL` kosong,
+dengan pesan yang menyebut semua variabel bermasalah sekaligus — bukan jalan
+setengah lalu error di request pertama.
+
+## Perintah
+
+| Perintah | Isi |
+|---|---|
+| `pnpm dev` | build contracts, lalu jalankan api + web bersamaan |
+| `pnpm lint` | ESLint seluruh repo (`eslint-disable` dimatikan, jadi lint tidak bisa dibungkam) |
+| `pnpm typecheck` | `tsc --noEmit` di semua paket |
+| `pnpm test` | Vitest di semua paket yang punya test |
+| `pnpm build` | contracts → api → web |
+| `pnpm verify` | keempatnya berurutan — sama dengan yang dijalankan CI |
+| `pnpm db:up` / `pnpm db:down` | Postgres lokal |
+
 ## Branch & Alur Rilis
 
 Repo ini **tidak punya branch `main`**. Hanya dua branch tetap:
@@ -63,12 +110,14 @@ Aturannya:
 
 ## Status
 
-Tahap 0 — repo baru, belum ada aplikasi. Struktur yang direncanakan: monorepo
-pnpm dengan `apps/web` (Next.js), `apps/api` (Express), dan `packages/contracts`
-berisi schema Zod + enum status yang dipakai kedua sisi.
+Minggu 1 hari 1 selesai: monorepo pnpm berjalan, TypeScript strict, ESLint,
+Postgres lewat Docker, validasi environment yang gagal-cepat, kerangka Express
+berlapis dengan envelope response, dan halaman Next pertama yang membaca enum
+dari `@imp/contracts`. Gate `pnpm verify` hijau (32 test).
 
-Urutan pengerjaan mengikuti [`docs/roadmap-4-minggu.md`](docs/roadmap-4-minggu.md):
-Fondasi & Auth → Perusahaan & Lowongan → Lamaran, Penugasan, Laporan → Evaluasi,
-Admin, Produksi.
+Belum ada: database schema, migrasi, autentikasi, dan seluruh fitur produk.
+Urutan berikutnya ada di [`docs/roadmap-4-minggu.md`](docs/roadmap-4-minggu.md):
+Fondasi & Auth → Perusahaan & Lowongan → Lamaran, Penugasan, Laporan →
+Evaluasi, Admin, Produksi.
 
 Prinsip utama: **MVP dulu sampai jalan end-to-end, MRV belakangan.**

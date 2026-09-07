@@ -596,6 +596,7 @@ diasumsikan sendiri.
 | 5 | Registrasi COMPANY langsung aktif, atau menunggu verifikasi ADMIN? | Minggu 1 |
 | 6 | Nomor minggu laporan diisi manual intern atau dihitung dari tanggal mulai? | Minggu 3 |
 | 7 | Dokumen ini dipakai internal saja (bahasa Indonesia) atau perlu versi Inggris? | kapan saja |
+| 8 | Akses database: Prisma, atau `pg` + tool migrasi terpisah? Belum dipasang apa pun, jadi masih bebas dipilih | Minggu 1 hari 2 |
 
 ---
 

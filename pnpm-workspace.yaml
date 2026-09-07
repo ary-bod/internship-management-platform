@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+
+# pnpm 11 memblokir postinstall script dependency secara default dan install
+# akan exit 1 kalau ada yang tertahan. esbuild butuh postinstall-nya untuk
+# mengunduh binary platform, dan esbuild dipakai oleh vitest serta tsx.
+allowBuilds:
+  esbuild: true

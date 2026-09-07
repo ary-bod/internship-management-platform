@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: imp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-imp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-imp}
+      POSTGRES_DB: ${POSTGRES_DB:-imp}
+    # Sengaja diikat ke 127.0.0.1: tanpa alamat eksplisit Docker membuka port
+    # ke seluruh antarmuka jaringan, termasuk Wi-Fi publik.
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-imp} -d ${POSTGRES_DB:-imp}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
