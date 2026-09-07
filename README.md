@@ -4,7 +4,14 @@ Platform manajemen magang end-to-end: perusahaan membuka posisi, kandidat melama
 lamaran diproses sampai diterima, lalu berjalan sebagai penugasan magang dengan
 laporan mingguan dan evaluasi akhir.
 
-Spesifikasi lengkap (MVP + MRV): [`docs/spec-mvp-mrv.md`](docs/spec-mvp-mrv.md)
+## Dokumen
+
+| Dokumen | Isi |
+|---|---|
+| [`docs/prd.md`](docs/prd.md) | Requirement MVP: peran, model data, enum & transisi status, kontrak API, aturan bisnis, DoD |
+| [`docs/roadmap-4-minggu.md`](docs/roadmap-4-minggu.md) | Rencana kerja per minggu untuk 1 bulan, DoD per minggu, urutan potong kalau jadwal tertekan |
+
+Backlog MRV ada di `docs/prd.md` §14 — tidak dikerjakan sebelum MVP terbukti jalan.
 
 ## Tech Stack
 
@@ -33,20 +40,35 @@ Lowongan → Lamaran → Review → Diterima → Penugasan → Laporan Mingguan 
 
 ## Branch & Alur Rilis
 
+Repo ini **tidak punya branch `main`**. Hanya dua branch tetap:
+
 | Branch | Peran |
 |---|---|
-| `development` | branch kerja harian + staging |
-| `main` | production (rilis, deliberate) |
+| `development` | branch kerja harian, sekaligus staging |
+| `production` | rilis produksi — hanya diisi lewat merge PR |
 
-Alur: commit ke `development` → PR `development` → `main` → CI jalan di PR →
-merge = rilis production.
+Alur rilis:
 
-Jangan commit langsung ke `main`.
+```text
+feature/<nama>  →  PR ke development  →  merge
+development     →  PR ke production   →  CI jalan di PR  →  merge = rilis
+```
+
+Aturannya:
+
+- Jangan pernah commit langsung ke `production`.
+- Jangan pernah force-push ke `production`.
+- Setiap perubahan masuk `production` lewat PR, supaya CI jadi gate sebelum
+  merge — bukan pemberitahuan setelah rilis.
 
 ## Status
 
-Tahap 0 — repo baru, belum ada aplikasi. Urutan pengerjaan mengikuti
-`docs/spec-mvp-mrv.md` §24: Foundation → Auth → Core CRUD → Business Logic →
-Frontend → MRV → Production.
+Tahap 0 — repo baru, belum ada aplikasi. Struktur yang direncanakan: monorepo
+pnpm dengan `apps/web` (Next.js), `apps/api` (Express), dan `packages/contracts`
+berisi schema Zod + enum status yang dipakai kedua sisi.
 
-Prinsip utama dari spec: **MVP dulu sampai jalan end-to-end, MRV belakangan.**
+Urutan pengerjaan mengikuti [`docs/roadmap-4-minggu.md`](docs/roadmap-4-minggu.md):
+Fondasi & Auth → Perusahaan & Lowongan → Lamaran, Penugasan, Laporan → Evaluasi,
+Admin, Produksi.
+
+Prinsip utama: **MVP dulu sampai jalan end-to-end, MRV belakangan.**
